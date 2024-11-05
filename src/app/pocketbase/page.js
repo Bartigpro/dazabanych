@@ -182,7 +182,7 @@ export default function Page() {
     <div className="gap-7 flex flex-wrap justify-center text-center">
       {rec &&
         rec.map((item, idx) => (
-          <Card key={idx} className="w-[400px] h-[600px] flex flex-col  text-center">
+          <Card key={idx} className="w-[400px] h-[700px] flex flex-col  text-center">
             <CardHeader>
               <CardTitle> marka: {item.marka}</CardTitle>
               <CardDescription>model: {item.model}</CardDescription>
@@ -201,7 +201,7 @@ export default function Page() {
               <p>czas: {item.czas_parkowania} minut</p>
               <p className="text-gray-600">{item.id}</p>
               <AlertDialog>
-  <AlertDialogTrigger >  <Button Aschild>USUŃ</Button></AlertDialogTrigger>
+  <AlertDialogTrigger >  <Button className="p-4" Aschild>USUŃ</Button></AlertDialogTrigger>
   <AlertDialogContent>
     <AlertDialogHeader>
       <AlertDialogTitle>Czy na pewno chcesz usunąć ten rekord?</AlertDialogTitle>
