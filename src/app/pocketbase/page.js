@@ -115,10 +115,10 @@ export default function Page() {
 
   }
 
-  const handleZdjecie = (e)=>{
-    console.log(e)
-    setZdjecie(e.target.files[0])
-  }
+  // const handleZdjecie = (e)=>{
+  //   console.log(e)
+  //   setZdjecie(e.target.files[0])
+  // }
   const usun = async (id) => {
     try {
       await pb.collection('samochody').delete(id);
@@ -192,6 +192,7 @@ export default function Page() {
                 src={pb.files.getUrl(item, item.zdjecie)}
                 width={500}
                 height={400}
+                alt={item.tytul}
                 
 
               />
