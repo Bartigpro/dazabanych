@@ -6,6 +6,7 @@ import {
     SheetHeader,
     SheetTitle,
     SheetTrigger,
+    SheetClose
 } from "@/components/ui/sheet"
 import {
     Card,
@@ -40,7 +41,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import Av from "@/components/useravatar";
 
 
 
@@ -54,9 +56,20 @@ export default function Home() {
         opis: "",
         cena: "",
     });
+    const [user, setUser] = useState(null)
+
+useEffect(()=>{
+    setUser(pb.authStore.model)
+}, [])
 
 
+const login = async () =>{
 
+    setUser(pb.authStore.model)
+    
+    
+
+}
 
     useEffect(() => {
         const getData = async () => {
@@ -127,30 +140,31 @@ export default function Home() {
 
     const handleEdit = async (id) => {
         try {
-            // Fetch the existing record to get its current state
+
             const existingRecord = await pb.collection('gry').getOne(id);
-            
-            // Prepare the updated data by merging existing record data with the new input values
+
+
             const updatedData = {
                 tytul: data.tytul || existingRecord.tytul,
                 opis: data.opis || existingRecord.opis,
                 cena: data.cena || existingRecord.cena,
+                zdjecie: data.zdjecie || existingRecord.zdjecie
             };
-            
-            // If there are files (e.g., images), use FormData to handle them
+
+
             const formData = new FormData();
             Object.keys(updatedData).forEach(key => {
                 formData.append(key, updatedData[key]);
             });
-    
-            // Update the record in PocketBase with the merged data
+
+
             const updatedRecord = await pb.collection('gry').update(id, formData);
-            
-            // Update local state by replacing the edited record in the array
-            setRec((prev) => 
+
+
+            setRec((prev) =>
                 prev.map((gra) => (gra.id === id ? updatedRecord : gra))
             );
-    
+
         } catch (err) {
             console.log("Error updating record:", err);
         }
@@ -198,13 +212,21 @@ export default function Home() {
 
 
     return (
-        <div className="flex flex-wrap gap-6">
+        <div>
+            
+               <div className="w-full ">
+                    <Av onLogin={login()} user={user} setUser={setUser}/>
+                </div> 
+
+            
+        <div className="flex flex-wrap gap-6 ">
+       
 
 
-
+          
             {Rec &&
                 Rec.map((gra, idx) => (
-                    <Card key={idx} className="w-[400px] h-[700px] flex flex-col  text-center">
+                    <Card key={idx} className="w-[400px] h-[550px] flex flex-col  text-center">
                         <CardHeader>
                             <CardTitle> <Image
                                 src={pb.files.getUrl(gra, gra.zdjecie)}
@@ -221,20 +243,20 @@ export default function Home() {
                             {gra.opis}
                         </CardContent>
                         <CardFooter className="mt-auto flex items-center justify-between gap-2">
-                            <Label className="text-sm">Dostępność</Label>
+                           
 
                             <DropdownMenu>
-                                <DropdownMenuTrigger>Open</DropdownMenuTrigger>
-                                <DropdownMenuContent>
+                                <DropdownMenuTrigger><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-ellipsis"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></DropdownMenuTrigger>
+                                <DropdownMenuContent className="flex-col flex justify-center">
                                     <DropdownMenuLabel></DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => usun(gra.id)} aschild>USUŃ</DropdownMenuItem>
+                                    <DropdownMenuItem className="p-0 pb-2" onClick={() => usun(gra.id)}  > <Button className="menu-item w-full"  >usuń</Button></DropdownMenuItem>
                                     <DropdownMenuItem onSelect={(event) => {
 
                                         event.preventDefault();
                                     }}
                                         asChild><Sheet>
-                                            <SheetTrigger>Edytuj</SheetTrigger>
+                                           <SheetTrigger className="menu-item"><Button className="menu-item w-full">Edytuj</Button></SheetTrigger>
                                             <SheetContent>
                                                 <SheetHeader>
                                                     <SheetTitle>Edycja</SheetTitle>
@@ -247,28 +269,40 @@ export default function Home() {
 
                                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                                                 <Label htmlFor="opis">Opis</Label>
-                                                                <Input onChange={(e) => { handleInputChange("opis", e) }} type="text" placeholder="opis" id="opis" defaultValue={gra.opis}/>
+                                                                <Input onChange={(e) => { handleInputChange("opis", e) }} type="text" placeholder="opis" id="opis" defaultValue={gra.opis} />
                                                             </div>
 
                                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                                                 <Label htmlFor="cena">cena(zl)</Label>
-                                                                <Input onChange={(e) => { handleInputChange("cena", e) }} type="number" placeholder="cena" id="cena" defaultValue={gra.cena}/>
+                                                                <Input onChange={(e) => { handleInputChange("cena", e) }} type="number" placeholder="cena" id="cena" defaultValue={gra.cena} />
+                                                            </div>
+                                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                                <Label htmlFor="zdjecie">zdjęcie</Label>
+                                                                <Input onChange={(e) => { handleZdjecie(e) }} type="file" placeholder="zdjecie" id="zdjecie" />
+                                                                <Image
+                                                                    src={pb.files.getUrl(gra, gra.zdjecie)}
+                                                                    width={200}
+                                                                    height={120}
+                                                                    alt={gra.tytul}
+
+                                                                />
                                                             </div>
 
-                                                            
 
 
-                                                            <div className="w-full">
-                                                            <Button onClick={() => handleEdit(gra.id)}>dodaj</Button>
-                                                            </div>
+                                                           <SheetClose>
+                                                           <Button onClick={() => handleEdit(gra.id)}>edytuj</Button>
+                                                           </SheetClose>
+                                                              
+                                                         
                                                         </div>
                                                     </SheetDescription>
                                                 </SheetHeader>
                                             </SheetContent>
                                         </Sheet></DropdownMenuItem>
                                 </DropdownMenuContent>
-                            </DropdownMenu>
-
+                            </DropdownMenu> 
+                            <Label className="text-sm">Dostępność</Label>
                             <Switch
                                 checked={gra.dostepnosc}
                                 onCheckedChange={() => handleSwitch(gra.id, gra.dostepnosc)}
@@ -280,7 +314,7 @@ export default function Home() {
 
             <Sheet>
                 <SheetTrigger>
-                    <Card className="w-[400px] h-[700px] flex flex-col  justify-center text-center items-center text-9xl">
+                    <Card className="w-[400px] h-[550px] flex flex-col  justify-center text-center items-center text-9xl">
                         <h1>+</h1>
                     </Card >
                 </SheetTrigger>
@@ -312,7 +346,10 @@ export default function Home() {
 
 
                             <div className="w-full">
-                                <Button onClick={handleSubmit}>dodaj</Button>
+                                <SheetClose asChild>
+                                    <Button onClick={handleSubmit}>dodaj</Button>
+                                </SheetClose>
+
                             </div>
                         </div>
 
@@ -322,6 +359,7 @@ export default function Home() {
                 </SheetContent>
             </Sheet>
 
+        </div>
         </div>
     );
 }
